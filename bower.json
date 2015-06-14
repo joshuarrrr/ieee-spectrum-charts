@@ -1,0 +1,14 @@
+{
+  "name": "smil-charts",
+  "private": true,
+  "dependencies": {
+    "modernizr": "~2.8.1",
+    "jquery": "~2.1.4",
+    "d3": "~3.5.5",
+    "nvd3": "~1.7.1",
+    "tabletop": "~1.4.2"
+  },
+  "resolutions": {
+    "d3": "<=3.3.13"
+  }
+}
