@@ -34,6 +34,10 @@ body {
   display: none;
 }
 
+#nvd3-chart {
+  position: relative;
+}
+
 .nvd3 .nv-axis.nv-x path.domain {
   stroke-opacity: .75;
 }
@@ -43,10 +47,12 @@ body {
 }
 
 .anno-layer {
+  font-weight: bold;
+  line-height: 1.1;
   position: absolute;
-  max-width: 140px;
-  text-align:center;
-  opacity: 0;
+  max-width: 125px;
+  text-align: left;
+  // opacity: 0;
 }
 
 .highlight-number {
