@@ -26,5 +26,10 @@
     "main-bower-files": "^2.5.0",
     "opn": "^1.0.0",
     "wiredep": "^2.0.0"
+  },
+  "dependencies": {
+    "browser-sync": "^2.9.6",
+    "concat-map": "0.0.1",
+    "lodash": "^3.10.1"
   }
 }

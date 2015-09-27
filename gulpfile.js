@@ -119,6 +119,7 @@ gulp.task('wiredep', function () {
 });
 
 gulp.task('build', ['jshint', 'html', 'images', 'fonts', 'extras'], function () {
+// gulp.task('build', ['html', 'images', 'fonts', 'extras'], function () {
   return gulp.src('dist/**/*').pipe($.size({title: 'build', gzip: true}));
 });
 
@@ -127,7 +128,7 @@ gulp.task('default', ['clean'], function () {
 });
 
 gulp.task('deploy', function() {
-  gulp.src('dist/**')
+  return gulp.src('dist/**')
     .pipe(rsync({
       root: 'dist',
       hostname: 'joshromero.com',

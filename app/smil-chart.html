@@ -1,0 +1,53 @@
+<!doctype html>
+<html class="no-js" lang="">
+  <head>
+    <meta charset="utf-8">
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>smil charts</title>
+    <!-- Place favicon.ico and apple-touch-icon.png in the root directory -->
+
+    <!-- build:css styles/vendor.css -->
+    <!-- bower:css -->
+    <link rel="stylesheet" href="/bower_components/nvd3/build/nv.d3.css" />
+    <!-- endbower -->
+    <!-- endbuild -->
+
+    <!-- build:css styles/main.css -->
+    <link rel="stylesheet" href="styles/main.css">
+    <!-- endbuild -->
+
+    <!-- build:js scripts/vendor/modernizr.js -->
+    <script src="/bower_components/modernizr/modernizr.js"></script>
+    <!-- endbuild -->
+  </head>
+  <body>
+    <!--[if lt IE 10]>
+      <p class="browserupgrade">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
+    <![endif]-->
+
+    
+      <div id="nvd3-chart">
+        <button id="inflation" class="button inflation">Adjust for inflation</button>
+        <button id="oil-intensity" class="button oil-intensity">Adjust for oil intensity</button>
+        <button id="reset" disabled class="button reset">Reset</button>
+        <div class="anno-layer"></div>
+        <svg style="height: 420px"></svg>
+      </div>
+    
+
+    <!-- build:js scripts/vendor.js -->
+    <!-- bower:js -->
+    <script src="/bower_components/jquery/dist/jquery.js"></script>
+    <script src="/bower_components/d3/d3.js"></script>
+    <script src="/bower_components/nvd3/build/nv.d3.js"></script>
+    <script src="/bower_components/tabletop/src/tabletop.js"></script>
+    <script src="/bower_components/pym.js/dist/pym.js"></script>
+    <!-- endbower -->
+    <!-- endbuild -->
+
+    <!-- build:js scripts/main.js -->
+    <script src="scripts/main.js"></script>
+    <!-- endbuild -->
+</body>
+</html>

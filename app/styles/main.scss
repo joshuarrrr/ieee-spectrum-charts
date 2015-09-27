@@ -1,33 +1,96 @@
 // bower:scss
 // endbower
 
-body {
-  background: #fafafa;
-  font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
-  color: #333;
+@font-face {
+  font-family: 'Theinhardt-Regular';
+  font-style: normal;
+  font-weight: normal;
+  src: url('../fonts/Theinhardt/Theinhardt-Regular.otf');
 }
 
-.hero-unit {
-  margin: 50px auto 0 auto;
-  width: 300px;
-  font-size: 18px;
-  font-weight: 200;
-  line-height: 30px;
-  background-color: #eee;
-  border-radius: 6px;
-  padding: 60px;
-  h1 {
-    font-size: 60px;
-    line-height: 1;
-    letter-spacing: -1px;
-  }
+@font-face {
+  font-family: 'Theinhardt-Regular';
+  font-style: italic;
+  font-weight: normal;
+  src: url('../fonts/Theinhardt/Theinhardt-RegularIta.otf');
+}
+
+@font-face {
+  font-family: 'Theinhardt-Regular';
+  font-style: normal;
+  font-weight: bold;
+  src: url('../fonts/Theinhardt/Theinhardt-Medium.otf');
+}
+
+@font-face {
+  font-family: 'Theinhardt-Regular';
+  font-style: italic;
+  font-weight: normal;
+  src: url('../fonts/Theinhardt/Theinhardt-MediumIta.otf');
+}
+
+@font-face {
+  font-family: 'Theinhardt-Medium';
+  font-style: normal;
+  font-weight: normal;
+  src: url('../fonts/Theinhardt/Theinhardt-Medium.otf');
+}
+
+@font-face {
+  font-family: 'Theinhardt-Medium';
+  font-style: italic;
+  font-weight: normal;
+  src: url('../fonts/Theinhardt/Theinhardt-MediumIta.otf');
+}
+
+@font-face {
+  font-family: 'Theinhardt-Medium';
+  font-style: normal;
+  font-weight: bold;
+  src: url('../fonts/Theinhardt/Theinhardt-Bold.otf');
+}
+
+@font-face {
+  font-family: 'Theinhardt-Medium';
+  font-style: italic;
+  font-weight: bold;
+  src: url('../fonts/Theinhardt/Theinhardt-BoldIta.otf');
+}
+
+@font-face {
+  font-family: 'Theinhardt-Bold';
+  font-style: normal;
+  font-weight: normal;
+  src: url('../fonts/Theinhardt/Theinhardt-Bold.otf');
+}
+
+@font-face {
+  font-family: 'Theinhardt-Bold';
+  font-style: italic;
+  font-weight: normal;
+  src: url('../fonts/Theinhardt/Theinhardt-BoldIta.otf');
+}
+
+
+$black: #000;
+$lightblack: #333;
+$blue: #007fc0;
+$red: #e30000;
+$gray: #bbb;
+$white: #fff;
+
+body {
+  background: $white;
+  color: $lightblack;
+  font-family: 'Theinhardt-Regular', Helvetica, Arial, sans-serif;
+  margin: 8px;
 }
 
 .browserupgrade {
-  margin: 0.2em 0;
-  background: #ccc;
-  color: #000;
-  padding: 0.2em 0;
+  background: $gray;
+  color: $black;
+  margin: .2em 0;
+  padding: .2em 0;
 }
 
 .tick.zero {
@@ -38,24 +101,84 @@ body {
   position: relative;
 }
 
+.button:not(:disabled) {
+  cursor: pointer;
+}
+
+.button.selected {
+  &.reset {
+    color: $black;
+  }
+
+  &.inflation {
+    color: $blue;
+  }
+
+  &.oil-intensity {
+    color: $red;
+  }
+}
+
+.button:disabled {
+  color: $gray;
+}
+
+.nvd3 text, 
+button {
+  font-family: 'Theinhardt-Regular', Arial, sans-serif;
+  font-size: 14px;
+}
+
 .nvd3 .nv-axis.nv-x path.domain {
   stroke-opacity: .75;
 }
 
-.barrel, .barrel-2 {
-  shape-rendering: crispEdges;
-}
+// .barrel, 
+// .barrel-2 {
+//   shape-rendering: crispEdges;
+// }
 
 .anno-layer {
   font-weight: bold;
   line-height: 1.1;
-  position: absolute;
   max-width: 125px;
+  position: absolute;
   text-align: left;
   // opacity: 0;
 }
 
 .highlight-number {
-  font-size: 2em;
   display: block;
+  font-size: 2em;
+}
+
+// .nvd3.nv-line .nvd3.nv-scatter .nv-groups .nv-point:nth-child(5n) {
+//     fill-opacity: 1;
+//     stroke-opacity: 1;
+//     fill: white;
+// }
+
+.nv-point {
+  fill: $white;
+  stroke-width: 2;
+}
+
+// .nvd3.nv-line .nvd3.nv-scatter .nv-groups .nv-point:nth-child(5n) {
+//   fill-opacity: 1;
+//   stroke-opacity: 1;
+// }
+
+.nvd3.nv-scatter .nv-groups .nv-point.hover, 
+.nvd3 .nv-groups .nv-point.hover {
+  stroke-width: 3px;
+}
+
+.nvtooltip {
+  background: rgba(255, 255, 255, .9);
+  border-radius: 0;
+
+  table td.legend-color-guide div {
+    border: 0;
+    border-radius: 10px;
+  }
 }

@@ -7,38 +7,36 @@
     <title>smil charts</title>
     <!-- Place favicon.ico and apple-touch-icon.png in the root directory -->
 
-    <!-- build:css styles/vendor.css -->
+    <!-- build:css styles/spectrum.css -->
     <!-- bower:css -->
     <link rel="stylesheet" href="/bower_components/nvd3/build/nv.d3.css" />
     <!-- endbower -->
     <!-- endbuild -->
 
-    <!-- build:css styles/spectrum.css -->
-    <!-- bower:css -->
-    <link rel="stylesheet" href="http://spectrum.ieee.org/assets/css/style.css">
-    <link rel="stylesheet" href="http://spectrum.ieee.org/assets/css/site419a.css">
+    <!-- build:js scripts/vendor.js -->
+    <!-- bower:js -->
+    <script src="/bower_components/jquery/dist/jquery.js"></script>
+    <script src="/bower_components/modernizr/modernizr.js"></script>
+    <script src="/bower_components/d3/d3.js"></script>
+    <script src="/bower_components/nvd3/build/nv.d3.js"></script>
+    <script src="/bower_components/tabletop/src/tabletop.js"></script>
+    <script src="/bower_components/pym.js/dist/pym.js"></script>
     <!-- endbower -->
     <!-- endbuild -->
 
-    <!-- build:css styles/main.css -->
-    <link rel="stylesheet" href="styles/main.css">
-    <!-- endbuild -->
-
-    <!-- build:js scripts/vendor/modernizr.js -->
-    <script src="/bower_components/modernizr/modernizr.js"></script>
-    <!-- endbuild -->
   </head>
-  <body>
+  <body style="background: gray;">
     <!--[if lt IE 10]>
       <p class="browserupgrade">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
     <![endif]-->
 
     
-    <div class="container" style="max-width:620px; margin:0 auto; background: white;">
-      <div id="nvd3-chart">
-        <button id="adjust"></button>
-        <div class="anno-layer"></div>
-        <svg style="height: 420px"></svg>
+    <div class="container" style="max-width:620px; margin:0 auto;">
+      <div id="smil-chart">
+        <script>
+          /* global pym */
+          var pymParent = new pym.Parent("smil-chart", "smil-chart.html", {});
+        </script>
       </div>
     </div>
 
@@ -53,17 +51,7 @@
       ga('create','UA-XXXXX-X');ga('send','pageview');
     </script>
 
-    <!-- build:js scripts/vendor.js -->
-    <!-- bower:js -->
-    <script src="/bower_components/jquery/dist/jquery.js"></script>
-    <script src="/bower_components/d3/d3.js"></script>
-    <script src="/bower_components/nvd3/build/nv.d3.js"></script>
-    <script src="/bower_components/tabletop/src/tabletop.js"></script>
-    <!-- endbower -->
-    <!-- endbuild -->
+    
 
-        <!-- build:js scripts/main.js -->
-        <script src="scripts/main.js"></script>
-        <!-- endbuild -->
 </body>
 </html>

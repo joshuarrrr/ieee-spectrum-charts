@@ -1,6 +1,7 @@
 /* jshint devel:true */
 /* global Tabletop */
 /* global d3 */
+/* global pym */
 (function () {
   'use strict';
   Tabletop.init( { 
@@ -11,47 +12,72 @@
 
   function renderCharts(sheets) {
     var data = sheets['Sheet1'];
-    console.log(data);
+    // console.log(data);
     
-    /* create nvd3 chart */
-    function myData(data) {
+    function myData(data, filter) {
+      /*
+        Process data for nvd3 chart. You can optionally pass a filtering function to filter the array.
+        But by default all data points are included. 
+      */
+      
+      filter = typeof filter !== 'undefined' ? filter : function(d) { return d; };
+
       var series1 = [];
       var series2 = [];
       var series3 = [];
       for(var i = 0; i < data.length; i ++) {
         series1.push({
           x: +data[i]['year'], 
-          y: +data[i]['crude price']
+          y: +data[i]['crude price'],
+          y1: +data[i]['crude price'],
+          y2: +data[i]['crude price']
         });
         series2.push({
           x: +data[i]['year'], 
-          y: +data[i]['crude price']
+          y: +data[i]['crude price'],
+          y1: +data[i]['crude price'],
+          y2: +data[i]['crude price (inflation adjusted)']
         });
         series3.push({
           x: +data[i]['year'], 
-          y: +data[i]['crude price (inflation adjusted)']
+          y: +data[i]['crude price (inflation adjusted)'],
+          y1: +data[i]['crude price (inflation adjusted)'],
+          y2: +data[i]['crude price (inflation and intensity adjusted)']
         });
       }
 
-      console.log(series1);
-      console.log(series2);
-      console.log(series3);
+      // console.log(series1);
+      // console.log(series2);
+      // console.log(series3);
 
       return [
         {
+          class: 'unadjusted',
           key: 'Unadjusted price',
-          values: series1,
-          color: '#000'
+          values: series1.filter(filter),
+          color: '#000',
+          annotation: 'Oil in 2014 <br>' +
+            'seems to be <span class="highlight-number">50x</span> more expensive <br>' +
+            'than in 1970&hellip;'
         },
         {
+          class: 'inflation',
           key: 'Adjusted for inflation',
-          values: series2,
-          color: '#007fc0'
+          values: series2.filter(filter),
+          color: '#007fc0',
+          annotation: 'But with inflation, <br>' +
+            'oil in 2014 <br>' +
+            'was only <span class="highlight-number">8x</span> more expensive <br>' +
+            'than in 1970&hellip;'
         },
         {
+          class: 'oil-intensity',
           key: 'Adjusted for inflation and intensity',
-          values: series3,
-          color: '#e30000'
+          values: series3.filter(filter),
+          color: '#e30000',
+          annotation: 'Correct for intensity, <br>' +
+            'and oil in 2014 was only <span class="highlight-number">3x</span> more expensive than in 1970&mdash;<br>' +
+            'still a large increase, but one the global economy could handle.'
         }
       ];
     }
@@ -62,23 +88,35 @@
       var chart = nv.models.lineChart()
         .options({
           duration: 1200,
-          useInteractiveGuideline: true,
+          // useInteractiveGuideline: true,
+          useVoronoi : true,
+          // showVoronoi : true,
           yDomain: [0,120],
-          interpolate: 'monotone'
+          interpolate: 'linear',
+          pointSize: 50
         })
       ;
 
+      
+
+      chart.tooltip.valueFormatter(function (d) { return 'US $' + d.toFixed(2) + ' / barrel'; })
+        .keyFormatter(function (d) { 
+          var words = d.split(' ');
+          return words.length > 3 ? words.slice(0,3).join(' ') + 
+          '<br>' + words.slice(3,words.length).join(' ') : d; });
+
+      // var series = myData(data.elements, function(d,i,arr) { return i % 5 === 0 || d.x === 2014; });
       var series = myData(data.elements);
 
-      var annoText = 'Oil in 2014 seems to be <span class="highlight-number">50x</span> more expensive than in 1970&hellip;';
+      var annoText = series[0].annotation;
 
-      var adjust = container.select('#adjust')
-        // .append('button')
-        // .attr('id','adjust')
-        // .attr('class','initial')
-        // .text('compare prices')
-        .attr('class','inflation')
-        .text('Adjust for inflation');
+      // var adjust = container.select('#adjust')
+      //   // .append('button')
+      //   // .attr('id','adjust')
+      //   // .attr('class','initial')
+      //   // .text('compare prices')
+      //   .attr('class','inflation')
+      //   .text('Adjust for inflation');
 
       chart.xAxis
         .axisLabel('Year');
@@ -112,6 +150,9 @@
         .datum([series[0]])
         .call(chart);
 
+      var pymChild = new pym.Child();
+      pymChild.sendHeight();
+
       
 
       // svg.select('g').selectAll('.barrel-2')
@@ -132,90 +173,77 @@
       //     .attr('fill', 'white');
       
 
+      var buttons = container.selectAll('button');
 
-      adjust.on('click', function() {
+      buttons.on('click', function() {
         var button = d3.select(this);
         var i = 0;
+        var seriesToDisplay = [series[0]];
 
-        if (button.classed('initial')) {
-          // drawMultiples(series[0]);
-          updateAnnotation();
+        // if (button.classed('initial')) {
+        //   // drawMultiples(series[0]);
 
-          button
-            .attr('class','inflation')
-            .text('Adjust for inflation');
+        //   // button
+        //   //   .attr('class','inflation')
+        //   //   .text('Adjust for inflation');
+        // }
+        if (button.classed('reset')) {
+          resetChart();
         }
-        else if (button.classed('inflation')) {
-          svg
-            .datum([series[0],series[1]])
-            .transition().duration(chart.duration()).call(chart);
-
-          for(i = 0; i < data.elements.length; i ++) {
-            series[1].values[i].y = +data.elements[i]['crude price (inflation adjusted)'];
+        else if (button.classed('selected')) {
+          if (button.classed('oil-intensity') && buttons.filter('.inflation').classed('selected')) {
+            adjustForInflation();
+            button.classed('selected', false);
+            updateAnnotation();
           }
-
-          // series[0].color = '#ddd';
-
-          chart.update();
-
-          annoText = 'But with inflation, oil in 2014 was only <span class="highlight-number">8x</span> more expensive than in 1970&hellip;';
-
-          // drawMultiples(series[1]);
-          updateAnnotation();
-
-          button
-            .attr('class','oil-intensity')
-            .text('Adjust for oil intensity');
-        }
-        else if (button.classed('oil-intensity')) {
-          svg
-            .datum(series)
-            .transition().duration(chart.duration()).call(chart);
-
-
-          for(i = 0; i < data.elements.length; i ++) {
-            series[2].values[i].y = +data.elements[i]['crude price (inflation and intensity adjusted)'];
+          else if (button.classed('inflation') && buttons.filter('.oil-intensity').classed('selected')) {
+            svg.datum([series[0], series[2]]).transition().delay(chart.duration()).call(chart);
+            button.classed('selected', false);
+            d3.selectAll('.nv-series').selectAll('text')
+              .style('fill', function(d) { return d.color; });
           }
-
-          // series[1].color = '#bbb';
-
-          chart.update();
-
-          annoText = 'Correct for intensity, and oil in 2014 was only <span class="highlight-number">3x</span> more expensive than in 1970&mdash;still a large increase, but one the global economy could handle.';
-          annoHTML
-            .style('max-width', '245px');
-
-          // drawMultiples(series[2]);
-          updateAnnotation();
-
-          button
-            .attr('class','reset')
-            .text('Reset chart');
+          else {
+            resetChart();
+          }
         }
         else {
-          for(i = 0; i < data.elements.length; i ++) {
-            series[2].values[i].y = series[1].values[i].y;
-            series[1].values[i].y = series[0].values[i].y;
+          buttons.filter('.reset').property('disabled', false);
+          if (button.classed('inflation')) {
+            if (buttons.filter('.oil-intensity').classed('selected')) {
+              for(i = 0; i < series[1].values.length; i ++) {
+                series[1].values[i].y = series[1].values[i].y1;
+              }
+              chart.update();
+              adjustForInflation().each('end', function(d,i) { return i === svg.data().length - 1 ? adjustForIntensity() : null; });
+            }
+            else {
+              seriesToDisplay.push(series[1]);
+              adjustForInflation();
+            }
+          }
+          else if (button.classed('oil-intensity')) {
+
+            if (!buttons.filter('.inflation').classed('selected')) {
+              buttons.filter('.inflation').classed('selected', true);
+              adjustForInflation().each('end', function(d,i) { return i === svg.data().length - 1 ? adjustForIntensity() : null; });
+            }
+            else {
+              adjustForIntensity();
+            }
+            
+          }
+          else {
+            resetChart();
           }
 
-          // series[0].color = '#00f';
-          // series[1].color = '#00f';
-
-          svg.datum([series[0]]).transition().delay(chart.duration()).call(chart);
-
-          annoText = 'Oil in 2014 seems to be <span class="highlight-number">50x</span> more expensive than in 1970&hellip;';
-          annoHTML
-            .style('max-width', null);
-
-          // drawMultiples(series[0]);
           updateAnnotation();
 
-          button
-            .attr('class','inflation')
-            .text('adjust for inflation');
+          button.classed('selected', true);
+          
+          d3.selectAll('.nv-series').selectAll('text')
+            .style('fill', function(d) { return d.color; });
+          // chart.update();
         }
-        
-        // chart.update();
       });
       
       
@@ -230,16 +258,16 @@
       //but we can get the conversion to the
       //screen coordinates.
 
-      var annoAnchor = svg.select('g').append('g')
-        .attr('class', 'anno-anchor')
-        .attr('x', chart.xAxis.scale()(1970))
-        .attr('y', chart.yAxis.scale()(series[0].values[series[0].values.length - 2].y));
+      // var annoAnchor = svg.select('g').append('g')
+      //   .attr('class', 'anno-anchor')
+      //   .attr('x', chart.xAxis.scale()(1970))
+      //   .attr('y', chart.yAxis.scale()(series[0].values[series[0].values.length - 2].y));
 
       var annoHTML = d3.select('div.anno-layer');
       
-      var matrix = annoAnchor.node().getScreenCTM()
-        .translate(+annoAnchor.node().getAttribute('x'),
-            +annoAnchor.node().getAttribute('y'));
+      // var matrix = annoAnchor.node().getScreenCTM()
+      //   .translate(+annoAnchor.node().getAttribute('x'),
+      //       +annoAnchor.node().getAttribute('y'));
 
       // annoHTML
       //   .style('left', 
@@ -249,7 +277,7 @@
       //   .html(annoText);
 
       annoHTML
-        .style('left', '70px')
+        .style('left', '300px')
         .style('top', '60px')
         .html(annoText);
 
@@ -262,14 +290,102 @@
 
       function updateAnnotation() {
         var anno = d3.select('div.anno-layer');
-        console.log(annoText);
-        console.log(anno);
+        // console.log(annoText);
+        // console.log(anno);
 
         anno
           .html(annoText);
 
         anno
           .style('opacity', 1);
+      }
+
+      function resetChart() {
+        for(var i = 0; i < series[2].values.length; i ++) {
+            series[2].values[i].y = series[2].values[i].y1;
+            series[1].values[i].y = series[1].values[i].y1;
+          }
+
+          // series[0].color = '#00f';
+          // series[1].color = '#00f';
+
+          svg.datum([series[0]]).transition().delay(chart.duration()).call(chart);
+
+          annoText = series[0].annotation;
+          annoHTML
+            .style('max-width', null)
+            .style('left', '300px')
+            .style('color', series[0].color)
+            .html(annoText);
+
+          buttons.classed('selected', false);
+          buttons.filter('.reset').property('disabled', true);
+
+          // drawMultiples(series[0]);
+
+          // button
+          //   .attr('class','inflation')
+          //   .text('Adjust for inflation');
+      }
+
+      function adjustForInflation() {
+        svg
+          .datum([series[0],series[1]])
+          .transition().duration(chart.duration()).call(chart);
+
+        for(var i = 0; i < series[1].values.length; i ++) {
+          series[1].values[i].y = series[1].values[i].y2;
+          series[2].values[i].y = series[2].values[i].y1;
+        }
+
+        // series[0].color = '#ddd';
+
+        chart.update();
+
+        annoText = series[1].annotation;
+        annoHTML
+          .style('color', series[1].color);
+
+        // drawMultiples(series[1]);
+
+        // button
+        //   .attr('class','oil-intensity')
+        //   .text('Adjust for oil intensity');
+        return svg
+          .datum([series[0],series[1]])
+          .transition().duration(chart.duration()).call(chart);
+
+      }
+
+      function adjustForIntensity() {
+        svg
+          .datum(series)
+          .transition().duration(chart.duration()).call(chart);
+
+
+        for(var i = 0; i < series[2].values.length; i ++) {
+          series[2].values[i].y = series[2].values[i].y2;
+        }
+
+        // series[1].color = '#bbb';
+
+        chart.update();
+
+        annoText = series[2].annotation;
+        annoHTML
+          .style('max-width', '245px')
+          .style('left', '245px')
+          .style('color', series[2].color)
+          .html(annoText);
+        
+        d3.selectAll('.nv-series').selectAll('text')
+          .style('fill', function(d) { return d.color; });
+
+        // drawMultiples(series[2]);
+
+        // button
+        //   .attr('class','reset')
+        //   .text('Reset chart');
       }
 
       // function drawMultiples (criteria) {
@@ -430,9 +546,9 @@
     });
   }
 
-  (function() {
+  // (function() {
     
-  })();
+  // })();
 
   // // load C3.js chart
   // /* global c3 */
