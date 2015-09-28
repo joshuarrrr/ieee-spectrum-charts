@@ -91,6 +91,7 @@
           // useInteractiveGuideline: true,
           useVoronoi : true,
           // showVoronoi : true,
+          showLegend: false,
           yDomain: [0,120],
           interpolate: 'linear',
           pointSize: 50
@@ -104,6 +105,8 @@
           var words = d.split(' ');
           return words.length > 3 ? words.slice(0,3).join(' ') + 
           '<br>' + words.slice(3,words.length).join(' ') : d; });
+
+      // chart.legend.radioButtonMode(true);
 
       // var series = myData(data.elements, function(d,i,arr) { return i % 5 === 0 || d.x === 2014; });
       var series = myData(data.elements);
