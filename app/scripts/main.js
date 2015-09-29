@@ -2,6 +2,8 @@
 /* global Tabletop */
 /* global d3 */
 /* global pym */
+/* global Modernizr */
+
 (function () {
   'use strict';
   Tabletop.init( { 
@@ -13,6 +15,8 @@
   function renderCharts(sheets) {
     var data = sheets['Sheet1'];
     // console.log(data);
+
+    var pymChild = new pym.Child();
     
     function myData(data, filter) {
       /*
@@ -82,6 +86,9 @@
       ];
     }
 
+    var isMobile = /ip(hone|od|ad)|android|blackberry.*applewebkit|bb1\d.*mobile/i.test(navigator.userAgent) && Modernizr.mq('only all and (max-width: 480px)');
+    // console.log(isMobile);
+
     /* global nv */
     nv.addGraph(function() {
       var container = d3.select('#nvd3-chart');
@@ -95,10 +102,7 @@
           yDomain: [0,120],
           interpolate: 'linear',
           pointSize: 50
-        })
-      ;
-
-      
+        });
 
       chart.tooltip.valueFormatter(function (d) { return 'US $' + d.toFixed(2) + ' / barrel'; })
         .keyFormatter(function (d) { 
@@ -112,6 +116,13 @@
       var series = myData(data.elements);
 
       var annoText = series[0].annotation;
+
+      if ( isMobile ) {
+        container.classed('mobile', true);
+        annoText = series[0].annotation.replace(/<br>/g,'');
+        container.select('svg')
+          .style('height', container.node().offsetWidth);
+      }
 
       // var adjust = container.select('#adjust')
       //   // .append('button')
@@ -153,8 +164,7 @@
         .datum([series[0]])
         .call(chart);
 
-      var pymChild = new pym.Child();
-      pymChild.sendHeight();
+      
 
       
 
@@ -202,8 +212,8 @@
           else if (button.classed('inflation') && buttons.filter('.oil-intensity').classed('selected')) {
             svg.datum([series[0], series[2]]).transition().delay(chart.duration()).call(chart);
             button.classed('selected', false);
-            d3.selectAll('.nv-series').selectAll('text')
-              .style('fill', function(d) { return d.color; });
+            // d3.selectAll('.nv-series').selectAll('text')
+            //   .style('fill', function(d) { return d.color; });
           }
           else {
             resetChart();
@@ -243,8 +253,8 @@
 
           button.classed('selected', true);
           
-          d3.selectAll('.nv-series').selectAll('text')
-            .style('fill', function(d) { return d.color; });
+          // d3.selectAll('.nv-series').selectAll('text')
+          //   .style('fill', function(d) { return d.color; });
           // chart.update();
         }
       });
@@ -280,8 +290,8 @@
       //   .html(annoText);
 
       annoHTML
-        .style('left', '300px')
-        .style('top', '60px')
+        // .style('left', '300px')
+        // .style('top', '60px')
         .html(annoText);
 
 
@@ -296,11 +306,19 @@
         // console.log(annoText);
         // console.log(anno);
 
-        anno
-          .html(annoText);
+        if ( isMobile ) {
+          anno
+            .html(annoText.replace(/<br>/g,''));
 
-        anno
-          .style('opacity', 1);
+          pymChild.sendHeight();
+        }
+        else {
+          anno
+            .html(annoText);
+        }
+        
+        // anno
+        //   .style('opacity', 1);
       }
 
       function resetChart() {
@@ -315,11 +333,21 @@
           svg.datum([series[0]]).transition().delay(chart.duration()).call(chart);
 
           annoText = series[0].annotation;
-          annoHTML
-            .style('max-width', null)
-            .style('left', '300px')
-            .style('color', series[0].color)
-            .html(annoText);
+
+          if ( isMobile ) {
+            annoHTML
+              .style('color', series[0].color)
+              .html(annoText.replace(/<br>/g,''));
+
+            pymChild.sendHeight();
+          }
+          else {
+            annoHTML
+              .style('max-width', null)
+              .style('left', '300px')
+              .style('color', series[0].color)
+              .html(annoText);
+          }
 
           buttons.classed('selected', false);
           buttons.filter('.reset').property('disabled', true);
@@ -375,14 +403,24 @@
         chart.update();
 
         annoText = series[2].annotation;
-        annoHTML
-          .style('max-width', '245px')
-          .style('left', '245px')
-          .style('color', series[2].color)
-          .html(annoText);
+
+        if ( isMobile ) {
+          annoHTML
+            .style('color', series[2].color)
+            .html(annoText.replace(/<br>/g,''));
+
+          pymChild.sendHeight();
+        }
+        else {
+          annoHTML
+            .style('max-width', '245px')
+            .style('left', '245px')
+            .style('color', series[2].color)
+            .html(annoText);
+        }
         
-        d3.selectAll('.nv-series').selectAll('text')
-          .style('fill', function(d) { return d.color; });
+        // d3.selectAll('.nv-series').selectAll('text')
+        //   .style('fill', function(d) { return d.color; });
 
         // drawMultiples(series[2]);
 
@@ -545,8 +583,12 @@
         
       // }
 
+      pymChild.sendHeight();
+
       return chart;
     });
+
+    
   }
 
   // (function() {

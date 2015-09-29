@@ -140,10 +140,12 @@ button {
 
 .anno-layer {
   font-weight: bold;
+  left: 300px;
   line-height: 1.1;
   max-width: 125px;
   position: absolute;
   text-align: left;
+  top: 60px;
   // opacity: 0;
 }
 
@@ -185,4 +187,14 @@ button {
 
 .nvd3 .nv-axis .nv-axisMaxMin text {
     font-weight: normal;
+}
+
+.mobile {
+  .anno-layer {
+    left: initial;
+    margin-top: 1em;
+    max-width: 100%;
+    position: static;
+    width: 100%;
+  }
 }
